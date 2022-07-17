@@ -9,7 +9,6 @@ export const initIO = (httpServer: Server) => {
           methods: ["GET", "POST"]
         }
       });
-      IO.configure().set("transports", ["xhr-polling"]);
 
     IO.use((socket: any, next: any) => {
         if (socket.handshake.query) {
@@ -30,7 +29,7 @@ export const initIO = (httpServer: Server) => {
             console.log(data.name);
             let callee = data.name;
             let rtcMessage = data.rtcMessage;
-            socket.to(callee).emit("newCall", {
+            socket.broadcast.to(callee).emit("newCall", {
                 caller: socket.user,
                 rtcMessage: rtcMessage
             })
@@ -43,7 +42,7 @@ export const initIO = (httpServer: Server) => {
             let caller = data.caller;
             const rtcMessage = data.rtcMessage
 
-            socket.to(caller).emit("callAnswered", {
+            socket.broadcast.to(caller).emit("callAnswered", {
                 callee: socket.user,
                 rtcMessage: rtcMessage
             })
@@ -56,7 +55,7 @@ export const initIO = (httpServer: Server) => {
             let otherUser = data.user;
             let rtcMessage = data.rtcMessage;
 
-            socket.to(otherUser).emit("ICEcandidate", {
+            socket.broadcast.to(otherUser).emit("ICEcandidate", {
                 sender: socket.user,
                 rtcMessage: rtcMessage
             })
