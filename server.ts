@@ -3,11 +3,18 @@ import { Server } from 'socket.io';
 let IO: any;
 
 export const initIO = (httpServer: Server) => {
-    IO = require('socket.io')(httpServer);
+    IO = require('socket.io')(httpServer, {
+        cors: {
+          origin: "*",
+          methods: ["GET", "POST"]
+        }
+      });
 
     IO.use((socket: any, next: any) => {
         if (socket.handshake.query) {
-            let userName = socket.handshake.query.name
+            console.log("middleware");
+            console.log(socket.handshake.query);
+            let userName = socket.handshake.query.user
             socket.user = userName;
             next();
         }
@@ -18,9 +25,10 @@ export const initIO = (httpServer: Server) => {
         socket.join(socket.user);
 
         socket.on('call', (data: any) => {
+            console.log("call");
+            console.log(data.name);
             let callee = data.name;
             let rtcMessage = data.rtcMessage;
-
             socket.to(callee).emit("newCall", {
                 caller: socket.user,
                 rtcMessage: rtcMessage
@@ -29,6 +37,8 @@ export const initIO = (httpServer: Server) => {
         })
 
         socket.on('answerCall', (data: any) => {
+            console.log("answer call");
+            console.log(data);
             let caller = data.caller;
             const rtcMessage = data.rtcMessage
 
@@ -40,6 +50,8 @@ export const initIO = (httpServer: Server) => {
         })
 
         socket.on('ICEcandidate', (data: any) => {
+            console.log("ice candidate call");
+            console.log(data);
             let otherUser = data.user;
             let rtcMessage = data.rtcMessage;
 
