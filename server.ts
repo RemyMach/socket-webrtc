@@ -9,6 +9,7 @@ export const initIO = (httpServer: Server) => {
           methods: ["GET", "POST"]
         }
       });
+      IO.configure().set("transports", ["xhr-polling"]);
 
     IO.use((socket: any, next: any) => {
         if (socket.handshake.query) {
