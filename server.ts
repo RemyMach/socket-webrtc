@@ -121,6 +121,16 @@ export const initIO = (httpServer: Server) => {
       socket.leave(socket.user);
       socket.leave(socket.room);
     });
+
+    socket.on("disconnected", () => {
+      console.log(socket.user, "Disconnected");
+      removeUserFromRoom(socket.room, socket.user);
+      socket.broadcast.to(socket.room).emit("userDisconnected", {
+        user: socket.user
+      });
+      socket.leave(socket.user);
+      socket.leave(socket.room);
+    });
   });
 };
 
