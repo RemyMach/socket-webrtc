@@ -11,6 +11,7 @@ export const initIO = (httpServer: Server) => {
       origin: "*",
       methods: ["GET", "POST"],
     },
+    path: "/camera"
   });
 
   IO.use((socket: any, next: any) => {
