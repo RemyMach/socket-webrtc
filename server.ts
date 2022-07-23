@@ -104,10 +104,6 @@ export const initIO = (httpServer: Server) => {
         rtcMessage: rtcMessage,
       });
 
-      /*socket.to(caller + "-connected").emit("callAnswered", {
-                callee: socket.user,
-                rtcMessage: rtcMessage
-            })*/
     });
 
     socket.on("ICEcandidate", (data: any) => {
@@ -136,11 +132,10 @@ export const initIO = (httpServer: Server) => {
     socket.on("disconnected", () => {
       console.log(socket.user, "Disconnected");
       removeUserFromRoom(socket.room, socket.user);
+      console.log(roomToUsers.get(socket.room));
       socket.broadcast.to(socket.room).emit("userDisconnected", {
         user: socket.user
       });
-      socket.leave(socket.user);
-      socket.leave(socket.room);
     });
   });
 };
