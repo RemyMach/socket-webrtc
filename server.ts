@@ -10,8 +10,7 @@ export const initIO = (httpServer: Server) => {
     cors: {
       origin: "*",
       methods: ["GET", "POST"],
-    },
-    path: "/camera"
+    }
   });
 
   IO.use((socket: any, next: any) => {
@@ -30,6 +29,17 @@ export const initIO = (httpServer: Server) => {
     console.log(socket.user, "Connected");
     socket.join(socket.user);
     socket.join(socket.room);
+
+    socket.on("hasToJoinOrCall", (data: {room: string}) => {
+
+      let users = roomToUsers.get(data.room);
+      if (users?.includes(socket.user)) return;
+      if (users && users.length > 1) {
+        socket.emit("youHaveToJoin");
+      }else {
+        socket.emit("youHaveToCall");
+      }
+    });
 
     socket.on("joinConversation", (data: { name: string; rtcMessage: any }) => {
       console.log("joinConversation");
@@ -166,14 +176,7 @@ export const joinUserAlreadyPresentInRoom = (socket: any, data: any) => {
   if (users?.includes(socket.user)) return;
   console.log(users);
   if (users && users.length > 1) {
-    console.log(users);
-    console.log(roomToUsers);
-    console.log(socket.user);
     users = users.filter((user: string) => {
-      console.log("in filter");
-      console.log(user);
-      console.log(socket.user);
-      console.log(data.otherUser);
 
       return user !== data.otherUser;
     });
